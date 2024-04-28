@@ -56,6 +56,14 @@ public class TarjetaCredito extends Tarjeta{
 		return this.habilitada;
 	}
 	
+	public double consultarLimite() {
+		return this.limite;
+	}
+	
+	public void setLimite(double nuevoLimite) {
+		this.limite = nuevoLimite;
+	}
+	
 	
 	public boolean pagarTarjetaCredito() {
 		
