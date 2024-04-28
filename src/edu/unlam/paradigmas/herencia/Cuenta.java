@@ -2,6 +2,8 @@ package edu.unlam.paradigmas.herencia;
 
 import java.util.ArrayList;
 
+import edu.unlam.paradigmas.herencia.PlazoFijo.TipoRenovacion;
+
 public class Cuenta {
 	protected double saldo;
 	protected ArrayList<Transaccion> registro = new ArrayList<>();
@@ -95,5 +97,26 @@ public class Cuenta {
 		Tarjeta tarjetaCuenta = new Tarjeta(nombreTitular, this);
 		return tarjetaCuenta;
 	}
+	
+	public TarjetaCredito obtieneTarjetaCredito(String nombreTitular, double limite) {
+		TarjetaCredito tarjetaCuenta = new TarjetaCredito(nombreTitular, this, limite);
+		return tarjetaCuenta;
+	}
+	
+	public TarjetaDebito obtieneTarjetaDebito(String nombreTitular) {
+		TarjetaDebito tarjetaCuenta = new TarjetaDebito(nombreTitular, this);
+		return tarjetaCuenta;
+	}
+	
+	public PlazoFijo abrirPlazoFijo(double capitalReservado) {
+		PlazoFijo plazo = new PlazoFijo(capitalReservado, this);
+		return plazo;
+	}
+	
+	public PlazoFijo abrirPlazoFijo(double capitalReservado, TipoRenovacion tipo) {
+		PlazoFijo plazo = new PlazoFijo(capitalReservado, this, tipo);
+		return plazo;
+	}
+	
 
 }

@@ -22,30 +22,40 @@ public class TarjetaCredito extends Tarjeta{
 */	
 	protected double limite;
 	protected double acumulado;
+	protected boolean habilitada;
 
 	public TarjetaCredito(String nombreTitular, Cuenta cuentaAsociada, double limite) {
 		super(nombreTitular,cuentaAsociada);
 		this.limite = limite;
 		this.acumulado = 0;
+		this.habilitada = true;
 	}
 	
 	public TarjetaCredito(String nombreTitular,Cuenta cuentaAsociada,int cvv,long numTarjeta,LocalDate validaDesde, LocalDate validaHasta, double limite) {
 		super(nombreTitular, cuentaAsociada, cvv, numTarjeta, validaDesde,  validaHasta);
 		this.limite = limite;
 		this.acumulado = 0;
+		this.habilitada = true;
 	}
 	
 	public boolean comprar(double montoAPagar) {
+		boolean band = false;
 		
-		if((acumulado + montoAPagar) > limite) {
-			return false;///puede tirar una excpecion
+		if(!this.habilitada || this.validaHasta.isBefore(LocalDate.now())) {
+			this.habilitada = false;
+		} else if((acumulado + montoAPagar) <= limite){
+			band = true;
+			acumulado += montoAPagar;
 		}
 		
-		acumulado += montoAPagar;
-		
-		
-		return true;
+		return band;	
 	}
+	
+	
+	public boolean consultarEstado() {
+		return this.habilitada;
+	}
+	
 	
 	public boolean pagarTarjetaCredito() {
 		
