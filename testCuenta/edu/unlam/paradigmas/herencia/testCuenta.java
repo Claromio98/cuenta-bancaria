@@ -46,20 +46,26 @@ class testCuenta {
 	    assertThrows(
 	      MovimientoNoValido.class, 
 	      () -> {
-	          miCuenta.depositar(-200);
+	          miCuenta.montoValido(-200);
 	      }
 	    );
+	    
+	    assertFalse(miCuenta.depositar(-200));
 	}
 
 	@Test
 	void testExtraerNoValido() {
 		miCuenta.depositar(100);
-	    assertThrows(
+	    
+		assertThrows(
 	      MovimientoNoValido.class, 
 	      () -> {
-	          miCuenta.extraer(-200);
+	          miCuenta.saldoDisponible(200);
 	      }
 	    );
+	    
+		assertFalse(miCuenta.extraer(200));
+		assertFalse(miCuenta.extraer(-200));
 	}
 	
 	@Test
@@ -85,6 +91,7 @@ class testCuenta {
 		assertEquals(0,cuentaDestino.consultarSaldo());
 		
 		assertFalse(cuentaDestino.transferir(550,miCuenta));
+		
 		assertEquals(450,miCuenta.consultarSaldo());
 		assertEquals(0,cuentaDestino.consultarSaldo());
 	}

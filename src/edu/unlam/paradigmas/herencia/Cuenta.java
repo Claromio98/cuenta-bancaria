@@ -21,67 +21,102 @@ public class Cuenta {
 		registro.add(trans);
 	}
 	
-	public boolean depositar(double monto) {
-		if(monto < 0 ) {
-			throw new MovimientoNoValido("No puede realizar este depósito.");
+	public void montoValido(double monto) {
+		if(monto < 0) {
+			throw new MovimientoNoValido("Monto no valido.");
 		}
+	}
+	
+	public void saldoDisponible(double monto) {
+		if(this.saldo < monto) {
+			throw new MovimientoNoValido("No puede realizar esta extracción.");
+		}
+	}
+	
+	public void acreditar(double monto) {
 		saldo += monto;
-		registrarMovimiento(monto,"Depósito");
+	}
+	
+	public void debitar(double monto) {
+		saldo -= monto;
+	}
+	
+	public boolean depositar(double monto) {
+		try {
+			montoValido(monto);
+			acreditar(monto);
+			registrarMovimiento(monto,"Depósito");
+		}catch(MovimientoNoValido e) {
+			e.getMessage();
+			return false;
+		}
 		return true;
 	}
 	
 	public boolean depositar(double monto, String motivo) {
-		if(monto < 0 ) {
-			throw new MovimientoNoValido("No puede realizar este depósito.");
+		try {
+			montoValido(monto);
+			acreditar(monto);
+			registrarMovimiento(monto,motivo);
+		}catch(MovimientoNoValido e) {
+			e.getMessage();
+			return false;
 		}
-		saldo += monto;
-		registrarMovimiento(monto,motivo);
+		
 		return true;
 	}
 	
 	public boolean extraer(double monto) {
-		if(this.saldo < monto || monto < 0) {
-			throw new MovimientoNoValido("No puede realizar esta extracción.");
+		try {
+			montoValido(monto);
+			saldoDisponible(monto);
+			
+			debitar(monto);
+			registrarMovimiento(monto,"Extraccion");
+		}catch(MovimientoNoValido e) {
+			e.getMessage();
+			return false;
 		}
-		
-		this.saldo -= monto;
-		registrarMovimiento(monto,"Extraccion");
 		
 		return true;
 	}
 	
 	public boolean extraer(double monto, String motivo) {
-		if(this.saldo < monto || monto < 0) {
-			throw new MovimientoNoValido("No puede realizar esta extracción.");
+		try {
+			montoValido(monto);
+			saldoDisponible(monto);
+			
+			debitar(monto);
+			registrarMovimiento(monto,motivo);
+		}catch(MovimientoNoValido e) {
+			e.getMessage();
+			return false;
 		}
-		
-		this.saldo -= monto;
-		registrarMovimiento(monto,motivo);
 		
 		return true;
 	}
 	
 	
-	public boolean transferir(double dinero, Cuenta cuentaDestino) {
-		try {
-			this.extraer(dinero, "Transferencia-Extracción");
-			cuentaDestino.depositar(dinero, "Transferencia-Depósito");
+	public synchronized boolean transferir(double dinero, Cuenta cuentaDestino) {
+		
+		if(this.extraer(dinero, "Transferencia-Extracción")) {
+			cuentaDestino.acreditar(dinero);
+			cuentaDestino.registrarMovimiento(dinero, "Transferencia-Depósito");
 			return true;
-		} catch (MovimientoNoValido mov) {
-			System.out.println("Ocurrió un error al transferir. "+ mov.getMessage());///investigar logger y log4j
-			return false;
 		}
+		return false;
+		
+
 	}
 	
-	public boolean transferir(double dinero, Cuenta cuentaDestino, String motivo) {
-		try {
-			this.extraer(dinero, motivo);
-			cuentaDestino.depositar(dinero, motivo);
+	public synchronized boolean transferir(double dinero, Cuenta cuentaDestino, String motivo) {
+		if(this.extraer(dinero, motivo)) {
+			cuentaDestino.acreditar(dinero);
+			cuentaDestino.registrarMovimiento(dinero, motivo);
 			return true;
-		} catch (MovimientoNoValido mov) {
-			System.out.println("Ocurrió un error al transferir. "+ mov.getMessage());///investigar logger y log4j
-			return false;
 		}
+		
+		return false;
 	}
 	
 	public void consultarRegistro() {

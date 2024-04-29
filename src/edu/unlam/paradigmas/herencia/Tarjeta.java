@@ -40,7 +40,6 @@ public class Tarjeta {
 			System.out.println("No se puede realizar la compra");
 		}
 		
-		
 		return true;
 	}
 	

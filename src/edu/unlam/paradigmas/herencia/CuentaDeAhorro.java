@@ -7,20 +7,19 @@ public class CuentaDeAhorro extends Cuenta{
 		saldoSecundario = 0;
 	}
 	
-	public boolean reservarSaldo(double monto) {
-		try {
-			this.extraer(monto);
+	public synchronized boolean reservarSaldo(double monto) {
+		if(this.extraer(monto)) {
 			this.saldoSecundario += monto;
 			return true;
-		} catch(MovimientoNoValido mov) {
-			System.out.println("Ocurrió un error al reservar.");
-			return false;
 		}
+		
+		System.out.println("Ocurrió un error al reservar.");
+		return false;
 	}
 	
 	public boolean reintegrarSaldo(double monto) {
 		if(monto <= this.saldoSecundario && monto >= 0) {
-			this.saldo += monto;
+			this.acreditar(monto);
 			this.saldoSecundario -= monto;
 			return true;
 		} else {
